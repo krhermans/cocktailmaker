@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cocktail Maker</title>
+<meta name="description" content="Cocktailgids met 22 recepten: benodigdheden, stappenplan, smaak en weetjes.">
+<meta name="theme-color" content="#eef1ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111613" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cocktails">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,700;1,6..96,500&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font:14px/1.4 system-ui,sans-serif}
+img{max-width:100%}
+[hidden]{display:none!important}
+
+/* Layout: a home-bar menu card. List of illustrated cocktails, tap opens a full-screen recipe sheet with two tabs (benodigdheden / stappenplan). */
+:root{
+  --bg:#eef1ec; --surface:#fbfcfa; --ink:#1c2420; --muted:#5d6a63; --line:#d6ddd7;
+  --accent:#1f5c4a; --accent-ink:#ffffff; --amber:#b8681f; --done:#9aa59f; --dim:#0000;
+  --shadow:0 1px 2px rgba(20,40,30,.06),0 6px 18px rgba(20,40,30,.07);
+  --display:"Bodoni Moda","Didot","Bodoni 72",Georgia,serif;
+  --body:"Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --tintmix:100%;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111613; --surface:#1a211d; --ink:#edf1ec; --muted:#9fada5; --line:#2c3631;
+  --accent:#74c7a4; --accent-ink:#0d1a14; --amber:#e3a35a; --done:#5f6b65;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25); --tintmix:62%; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111613; --surface:#1a211d; --ink:#edf1ec; --muted:#9fada5; --line:#2c3631;
+  --accent:#74c7a4; --accent-ink:#0d1a14; --amber:#e3a35a; --done:#5f6b65;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25); --tintmix:62%; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:860px;margin:0 auto;padding:20px 16px 48px}
+
+/* Home */
+.mast{display:flex;flex-direction:column;gap:4px;padding-block:8px 18px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:700}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(40px,11vw,64px);line-height:.95;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1 em{font-style:italic;font-weight:500;color:var(--accent)}
+.mast p{margin:6px 0 0;color:var(--muted);max-width:46ch}
+.search{position:relative;margin-top:6px}
+.search input{width:100%;font:inherit;font-size:16px;padding:12px 14px 12px 42px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;stroke:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding:14px 0 4px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);padding:7px 14px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.count{font-size:13px;color:var(--muted);margin:12px 0 10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.card{display:flex;flex-direction:column;text-align:left;background:var(--surface);border:0;border-radius:18px;overflow:hidden;cursor:pointer;padding:0;box-shadow:var(--shadow);transition:transform .15s ease}
+.card:active{transform:scale(.98)}
+.card .art{background:color-mix(in oklab,var(--tint) var(--tintmix),#0c110e);aspect-ratio:1/1.02;display:grid;place-items:center;position:relative}
+.card .art svg{width:88%;height:auto;display:block}
+.card .meta{padding:10px 12px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.card h3{font-family:var(--display);font-weight:700;font-size:19px;line-height:1.1;margin:0}
+.card small{color:var(--muted);font-size:12.5px}
+.fav-dot{position:absolute;top:8px;right:10px;font-size:16px;color:#b3263f}
+.badge{position:absolute;left:8px;top:8px;background:rgba(255,255,255,.85);color:#1d4d3c;font-size:11px;font-weight:700;letter-spacing:.04em;padding:3px 8px;border-radius:999px}
+.empty{color:var(--muted);padding:30px 0;text-align:center}
+
+/* Detail sheet */
+.sheet{position:fixed;inset:0;background:var(--bg);overflow-y:auto;z-index:10;-webkit-overflow-scrolling:touch;animation:up .28s ease}
+@keyframes up{from{transform:translateY(24px);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.sheet{animation:none}.card{transition:none}}
+.topbar{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 10px;background:color-mix(in oklab,var(--bg) 88%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.iconbtn{border:0;background:var(--surface);border-radius:999px;height:40px;padding:0 14px;display:flex;align-items:center;gap:6px;font-weight:600;font-size:15px;cursor:pointer;box-shadow:var(--shadow)}
+.iconbtn svg{width:18px;height:18px}
+.iconbtn.fav[aria-pressed="true"]{color:#c42a47}
+.hero{background:color-mix(in oklab,var(--tint) var(--tintmix),#0c110e);display:grid;place-items:center;padding:6px 0 0;margin-top:-60px;padding-top:60px}
+.hero svg{width:min(78vw,340px);height:auto;display:block}
+.inner{max-width:680px;margin:0 auto;padding:18px 16px calc(env(safe-area-inset-bottom,0px) + 40px)}
+.d-title{font-family:var(--display);font-size:clamp(34px,9vw,48px);font-weight:700;line-height:1;margin:4px 0 10px;text-wrap:balance}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12.5px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.tag.af{color:var(--accent);border-color:color-mix(in oklab,var(--accent) 40%,var(--line))}
+.taste{font-size:17px;margin:16px 0 0;max-width:60ch}
+.fact{margin:16px 0 0;padding:14px 16px;border-radius:14px;background:var(--surface);display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start}
+.fact .k{font-family:var(--display);font-style:italic;font-size:26px;line-height:1;color:var(--amber)}
+.fact b{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin-bottom:2px}
+.fact p{margin:0;font-size:15px;min-width:0}
+.note{margin:12px 0 0;font-size:13.5px;color:var(--muted);border-left:2px solid var(--amber);padding-left:10px}
+
+.seg{position:sticky;top:calc(env(safe-area-inset-top,0px) + 60px);z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;margin:22px 0 4px;background:var(--surface);border-radius:14px;box-shadow:var(--shadow)}
+.seg button{border:0;background:transparent;padding:10px 6px;border-radius:10px;font-weight:700;font-size:15px;cursor:pointer;color:var(--muted)}
+.seg button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+
+.persons{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0 6px}
+.persons span{font-weight:600}
+.stepper{display:flex;align-items:center;gap:4px;background:var(--surface);border-radius:999px;padding:4px;border:1px solid var(--line)}
+.stepper button{width:34px;height:34px;border-radius:999px;border:0;background:transparent;font-size:20px;font-weight:600;cursor:pointer}
+.stepper output{min-width:64px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.hint{font-size:13px;color:var(--muted);margin:0 0 4px}
+
+h4{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:22px 0 8px;font-weight:700}
+.list{list-style:none;margin:0;padding:0;background:var(--surface);border-radius:14px;overflow:hidden}
+.list li{border-top:1px solid var(--line)}
+.list li:first-child{border-top:0}
+.check{display:flex;gap:12px;align-items:center;width:100%;text-align:left;border:0;background:transparent;padding:12px 14px;cursor:pointer}
+.box{flex:none;width:22px;height:22px;border-radius:7px;border:2px solid var(--line);display:grid;place-items:center}
+.check[aria-pressed="true"] .box{background:var(--accent);border-color:var(--accent)}
+.check[aria-pressed="true"] .box::after{content:"";width:6px;height:11px;border:solid var(--accent-ink);border-width:0 2.5px 2.5px 0;transform:translateY(-1px) rotate(45deg)}
+.check[aria-pressed="true"] .txt{color:var(--done);text-decoration:line-through}
+.qty{font-variant-numeric:tabular-nums;font-weight:700;min-width:74px;display:inline-block}
+.txt{min-width:0}
+.plain{padding:12px 14px;display:flex;gap:12px;align-items:center}
+.ico{flex:none;width:22px;height:22px;color:var(--accent)}
+
+.progress{display:flex;align-items:center;gap:12px;margin:16px 0 4px}
+.bar{flex:1;height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+.progress small{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:600}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.step{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start;width:100%;text-align:left;border:0;background:var(--surface);border-radius:14px;padding:14px;cursor:pointer;box-shadow:var(--shadow)}
+.num{width:36px;height:36px;border-radius:999px;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:18px;background:color-mix(in oklab,var(--accent) 14%,var(--surface));color:var(--accent)}
+.step.prep .num{background:color-mix(in oklab,var(--amber) 16%,var(--surface));color:var(--amber);font-size:15px}
+.step .s-txt{font-size:16.5px;padding-top:5px;min-width:0}
+.step .s-txt b{font-weight:700}
+.step .lbl{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);font-weight:700}
+.step[aria-pressed="true"]{box-shadow:none;background:transparent;border:1px dashed var(--line)}
+.step[aria-pressed="true"] .num{background:var(--accent);color:var(--accent-ink)}
+.step[aria-pressed="true"] .s-txt{color:var(--done)}
+.tip{margin:14px 0 0;padding:12px 14px;border-radius:14px;border:1px solid var(--line);font-size:15px}
+.tip b{color:var(--amber)}
+.reset{margin-top:16px;border:1px solid var(--line);background:transparent;border-radius:999px;padding:9px 16px;font-weight:600;font-size:14px;cursor:pointer;color:var(--muted)}
+.cheers{display:none;margin-top:14px;text-align:center;font-family:var(--display);font-style:italic;font-size:26px;color:var(--accent)}
+.cheers.on{display:block}
+.wl{font-size:12.5px;color:var(--muted);margin-top:8px}
+footer{margin-top:32px;font-size:13px;color:var(--muted)}
+
+.intro{max-width:680px;margin:0 auto;padding:18px 16px 0}
+.inner{padding-top:0}
+.colhead{display:none}
+
+/* iPad / groot scherm liggend: lijst links, recept rechts */
+@media (min-width:1000px){
+  #home{position:fixed;top:0;bottom:0;left:0;width:400px;overflow-y:auto;max-width:none;margin:0;padding:calc(env(safe-area-inset-top,0px) + 24px) 20px 40px;border-right:1px solid var(--line)}
+  #home h1{font-size:48px}
+  .grid{grid-template-columns:1fr 1fr}
+  .card[aria-current="true"]{outline:3px solid var(--accent);outline-offset:2px}
+  .sheet{left:400px;z-index:1;animation:none}
+  .topbar{justify-content:flex-end;padding:calc(env(safe-area-inset-top,0px) + 16px) 32px 8px;background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;pointer-events:none}
+  .topbar .iconbtn{pointer-events:auto}
+  .head{padding-top:0!important}
+  #back{display:none}
+  .head{display:grid;grid-template-columns:minmax(300px,42%) 1fr;gap:36px;align-items:center;max-width:1040px;margin:0 auto;padding:28px 32px 0}
+  .hero{margin:0;padding:12px;border-radius:28px}
+  .hero svg{width:100%;max-width:360px}
+  .intro{padding:0;margin:0;max-width:56ch}
+  .d-title{font-size:56px}
+  .inner{max-width:1040px;padding:8px 32px 48px}
+  .seg{display:none}
+  .cols{display:grid;grid-template-columns:1fr 1.3fr;gap:36px;align-items:start}
+  .cols section[hidden]{display:block!important}
+  .colhead{display:block;font-family:var(--display);font-size:28px;font-weight:700;margin:12px 0 0}
+  .col-steps .progress{margin-top:12px}
+  .persons{max-width:420px;padding-top:24px}
+  .step .s-txt{font-size:17.5px}
+}
+@media (min-width:1000px) and (max-width:1149px){
+  .cols{grid-template-columns:1fr}
+  .head{grid-template-columns:1fr;max-width:640px}
+  .hero svg{max-width:300px}
+}
+
+/* Menu */
+.mast{position:relative}
+.menuwrap{position:absolute;top:4px;right:0}
+.menubtn{border:0;background:var(--surface);border-radius:999px;width:44px;height:44px;display:grid;place-items:center;cursor:pointer;box-shadow:var(--shadow)}
+.menubtn svg{width:22px;height:22px}
+.menu{position:absolute;right:0;top:52px;min-width:230px;background:var(--surface);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:6px;z-index:5;display:flex;flex-direction:column}
+.menu[hidden],.kaart[hidden],.sheet[hidden]{display:none}
+.menu button{border:0;background:transparent;text-align:left;padding:12px 12px;border-radius:10px;font-weight:600;cursor:pointer;display:flex;gap:10px;align-items:center}
+.menu button:hover{background:var(--bg)}
+.menu svg{width:20px;height:20px;color:var(--accent);flex:none}
+
+/* Cocktailkaart: always a printed-paper look, independent of theme */
+.kaart{position:fixed;inset:0;z-index:20;overflow-y:auto;background:#e9ebe6;-webkit-overflow-scrolling:touch}
+.kaart .topbar{background:rgba(233,235,230,.9);color:#1c2420}
+.kaart .iconbtn{background:#fff;color:#1c2420}
+.k-actions{display:flex;gap:8px}
+a.iconbtn{text-decoration:none}
+.paper{--k-ink:#1b2a24;--k-muted:#5b6862;--k-gold:#a8691f;--k-line:#d9ddd5;
+  background:#fffefb;color:var(--k-ink);max-width:820px;margin:8px auto 40px;padding:36px 22px 40px;box-shadow:0 2px 20px rgba(0,0,0,.08)}
+.k-cover{text-align:center;padding:12px 0 26px;border-bottom:1px solid var(--k-line)}
+.k-cover .eb{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--k-gold);font-weight:700}
+.k-cover h2{font-family:var(--display);font-size:clamp(46px,12vw,84px);font-weight:500;font-style:italic;line-height:1;margin:10px 0 8px;letter-spacing:-.01em}
+.k-cover p{margin:0 auto;max-width:44ch;color:var(--k-muted);font-size:15px}
+.k-cover-art{display:none;justify-content:center;gap:4mm;margin:12mm 0 0}
+.k-cover-art span{width:26mm;height:26mm;border-radius:50%;overflow:hidden;display:grid;place-items:center}
+.k-cover-art svg{width:118%;height:auto;margin-top:6%}
+.k-toc{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;margin-top:16px;font-family:var(--display);font-style:italic;font-size:16px;color:var(--k-gold)}
+.k-sec{padding-top:30px}
+.k-sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+.k-sec-head h3{font-family:var(--display);font-size:30px;font-weight:700;margin:0;line-height:1.05;white-space:nowrap}
+.k-sec-head::after{content:"";flex:1;border-bottom:1px solid var(--k-line);transform:translateY(-6px)}
+.k-sec-sub{margin:0 0 14px;color:var(--k-muted);font-style:italic;font-family:var(--display);font-size:17px}
+.k-grid{display:grid;grid-template-columns:1fr;gap:18px 30px}
+@media (min-width:640px){.k-grid{grid-template-columns:1fr 1fr}.paper{padding:52px 48px 56px}}
+.k-item{display:grid;grid-template-columns:92px 1fr;gap:14px;align-items:start;break-inside:avoid}
+.k-img{width:92px;height:92px;border-radius:50%;overflow:hidden;display:grid;place-items:center}
+.k-img svg{width:118%;height:auto;margin-top:6%}
+.k-body{min-width:0}
+.k-body h5{font-family:var(--display);font-size:21px;font-weight:700;margin:0;line-height:1.1}
+.k-body h5 small{font-family:var(--body);font-size:10px;font-weight:700;letter-spacing:.12em;color:#1f6b52;border:1px solid #9cc7b5;border-radius:99px;padding:1px 6px;margin-left:6px;vertical-align:3px}
+.k-ing{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--k-gold);font-weight:700;margin:4px 0 4px;line-height:1.45}
+.k-taste{font-size:13.5px;line-height:1.45;margin:0}
+.k-fact{font-family:var(--display);font-style:italic;font-size:13.5px;line-height:1.4;color:var(--k-muted);margin:5px 0 0}
+.k-foot{text-align:center;margin-top:34px;padding-top:16px;border-top:1px solid var(--k-line);font-size:12px;color:var(--k-muted);letter-spacing:.06em}
+
+@media print{
+  @page{size:A4;margin:14mm 13mm}
+  html,body{background:#fff!important}
+  #home,#sheet,.kaart .topbar{display:none!important}
+  .kaart{position:static;overflow:visible;background:#fff}
+  .paper{box-shadow:none;margin:0;max-width:none;padding:0;background:#fff}
+  .k-grid{grid-template-columns:1fr 1fr;gap:9mm 9mm}
+  .k-item{grid-template-columns:30mm 1fr;gap:4.5mm}
+  .k-img{width:30mm;height:30mm}
+  .k-body h5{font-size:19pt}
+  .k-ing{font-size:7.6pt;margin:1.5mm 0 2mm}
+  .k-taste{font-size:10.2pt;line-height:1.45}
+  .k-fact{font-size:10pt;margin-top:2mm}
+  .k-sec-head h3{font-size:26pt}
+  .k-sec-sub{font-size:12.5pt;margin-bottom:7mm}
+  .k-sec+.k-sec{break-before:page}
+  .k-sec.keep{break-before:auto}
+  *{outline:none!important}
+  .k-cover{height:262mm;display:flex;flex-direction:column;justify-content:center;border-bottom:0;break-after:page;padding:0}
+  .k-cover h2{font-size:78pt;margin:6mm 0 5mm}
+  .k-cover p{font-size:13pt}
+  .k-toc{font-size:14pt;margin-top:10mm;flex-direction:column;gap:2mm}
+  .k-cover-art{display:flex!important}
+  .k-sec{padding-top:8mm}
+  .k-sec-head{break-after:avoid}
+  .k-sec-sub{break-after:avoid}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="home">
+  <header class="mast">
+    <div class="menuwrap">
+      <button class="menubtn" id="menubtn" aria-label="Menu" aria-expanded="false" aria-controls="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <div class="menu" id="menu" hidden>
+        <button id="m-kaart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M7 8V3h10v5"/><rect x="3" y="8" width="18" height="9" rx="2"/><path d="M7 14h10v7H7z"/></svg>Print cocktailkaart</button>
+      </div>
+    </div>
+    <span class="eyebrow">De huisbar</span>
+    <h1>Cocktail <em>Maker</em></h1>
+    <p>Kies een cocktail en volg het stappenplan. Bij elk recept vind je ook alles wat je moet klaarzetten.</p>
+  </header>
+  <label class="search" for="q">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="Zoek op naam of ingrediënt…" autocomplete="off">
+  </label>
+  <div class="chips" id="chips" role="toolbar" aria-label="Filter"></div>
+  <div class="count" id="count"></div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" hidden>Geen cocktails gevonden. Probeer een andere zoekterm of filter.</div>
+  <footer>Recepten gebaseerd op je eigen Cocktail Maker-lijst. Geniet met mate. · Versie 1.2</footer>
+</div>
+
+<div class="sheet" id="sheet" hidden></div>
+<div class="kaart" id="kaart" hidden>
+  <div class="topbar">
+    <button class="iconbtn" id="k-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>Terug</button>
+    <span class="k-actions"><button class="iconbtn" id="k-print" type="button">Printen</button><a class="iconbtn" href="cocktailkaart.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M7 8V3h10v5"/><rect x="3" y="8" width="18" height="9" rx="2"/><path d="M7 14h10v7H7z"/></svg>PDF</a></span>
+  </div>
+  <div class="paper" id="paper"></div>
+</div>
+
+<script>
+/* ---------- Data (uit COCKTAIL_Maker.xlsx) ----------
+ ing: [hoeveelheid (getal | [min,max] | null), eenheid, naam, soort ('g' = garnituur), meervoud]
+ In stappen verwijst {n} naar ingrediënt n (wordt geschaald met het aantal personen). */
+const C = [
+{id:"aperol-spritz",name:"Aperol Spritz",glass:"Groot wijnglas",method:"Gebouwd",cat:["Bubbels"],tint:"#f6bf8d",
+ look:{g:"wine",top:"#ff9a3c",bot:"#e4531b",ice:"cubes",bubbles:1,garnish:["orange"]},
+ taste:"Bitterzoet en zomers: sinaasappel en kruiden van de Aperol, opgefrist door droge prosecco en bubbels. Laag in alcohol en ideaal als aperitief.",
+ fact:"Aperol werd in 1919 in Padua gelanceerd. De klassieke spritzverhouding 3-2-1 (prosecco, Aperol, spuitwater) is precies de verhouding uit jouw recept.",
+ ing:[[90,"ml","prosecco"],[60,"ml","Aperol"],[30,"ml","spuitwater"],[null,"","ijsblokjes"],[1,"","sinaasappelpartje","g","sinaasappelpartjes"]],
+ tools:["Groot wijnglas","Jigger (maatbekertje)","Barlepel","Mes en snijplank"],
+ prep:[],
+ steps:["Vul het wijnglas royaal met {3}.","Schenk {0} over het ijs.","Voeg {1} toe.","Top af met {2}.","Roer één keer kort en zacht met de barlepel, zo blijven de bubbels intact.","Garneer met {4}."]},
+
+{id:"army-navy",name:"Army & Navy",glass:"Martiniglas",method:"Shaker",cat:["Gin"],tint:"#d9d3c0",
+ look:{g:"martini",top:"#f6ead0",bot:"#e6cf9f",garnish:["lemontwist"]},
+ taste:"Zacht en nootachtig: de amandeltonen van orgeat ronden de jeneverbes van de gin af, met een frisse zure toets van limoen en een vleugje kruidigheid van de bitter.",
+ fact:"De naam verwijst naar de jaarlijkse footballwedstrijd tussen de Amerikaanse leger- en marineacademie. Het recept werd beroemd via David Embury's klassieker The Fine Art of Mixing Drinks uit 1948.",
+ ing:[[60,"ml","gin"],[20,"ml","orgeat (amandelsiroop)"],[20,"ml","limoensap"],[1,"dash","Angostura bitter"],[null,"","ijsblokjes"],[1,"","citroenschil","g","citroenschillen"]],
+ tools:["Martiniglas","Cocktailshaker","Jigger (maatbekertje)","Strainer","Fijn zeefje","Dunschiller","Citruspers"],
+ prep:[],
+ steps:["Doe {1}, {2}, {0} en {3} in de shaker.","Vul de shaker met {4}.","Shake krachtig 8 à 10 seconden.","Giet af door de strainer én het fijne zeefje (double strain) in het martiniglas.","Wrijf {5} over de rand van het glas en leg ze daarna in de cocktail."]},
+
+{id:"bellini-night-orient",name:"Bellini Night Oriënt",virgin:true,glass:"Champagneglas (fluitje)",method:"Schenken",cat:["Alcoholvrij","Bubbels"],tint:"#f7cbb8",
+ look:{g:"flute",top:"#ffd0ae",bot:"#f29a78",bubbles:1,garnish:[]},
+ taste:"Alcoholvrij en feestelijk: fruitig, licht zoet en sprankelend, in de stijl van een klassieke Bellini.",
+ fact:"De originele Bellini werd in 1948 bedacht in Harry's Bar in Venetië. Hij is genoemd naar de schilder Giovanni Bellini, om de zachtroze kleur die aan zijn schilderijen deed denken.",
+ note:"In je Excel staat bij deze cocktail alleen “glaasje”. Ik ben ervan uitgegaan dat het een kant-en-klare alcoholvrije bubbel is die je enkel schenkt.",
+ ing:[[1,"glas","Bellini Night Oriënt (alcoholvrij), goed gekoeld"]],
+ tools:["Champagneglas (fluitje)"],
+ prep:["Zet de fles minstens een paar uur in de koelkast."],
+ steps:["Houd het fluitje licht schuin en schenk {0} langzaam in, zodat het niet overschuimt.","Serveer meteen, nu de bubbels op hun fijnst zijn."]},
+
+{id:"cosmopolitan",name:"Cosmopolitan",glass:"Martiniglas",method:"Shaker",cat:["Vodka"],tint:"#f2b7c6",
+ look:{g:"martini",top:"#f47a96",bot:"#d2335b",garnish:["limewedge"]},
+ taste:"Fris, fruitig en licht zuur: cranberry en limoen, met de sinaasappelzoetheid van Cointreau op een strakke vodkabasis.",
+ fact:"De moderne versie werd eind jaren '80 in New York verfijnd door barman Toby Cecchini. Wereldberoemd werd hij als vaste drank van Carrie Bradshaw in Sex and the City.",
+ ing:[[30,"ml","vodka"],[20,"ml","Cointreau"],[30,"ml","veenbessensap (cranberry)"],[20,"ml","limoensap"],[10,"ml","suikerwater"],[null,"","ijsblokjes"],[null,"","limoenpartje of sinaasappelschil","g"]],
+ tools:["Martiniglas","Cocktailshaker","Jigger (maatbekertje)","Strainer","Citruspers","Mes en snijplank"],
+ prep:["Koel het martiniglas voor: zet het in de vriezer, of vul het met ijs en water terwijl je de cocktail maakt."],
+ steps:["Doe {0}, {1}, {2}, {3} en {4} in de shaker.","Vul de shaker met {5}.","Shake krachtig zo'n 10 seconden, tot de shaker ijskoud aanvoelt.","Gooi het ijs(water) uit het voorgekoelde glas.","Zeef de cocktail in het martiniglas.","Garneer met een limoenpartje op de rand of een sinaasappelschil in het glas."]},
+
+{id:"cuba-libre",name:"Cuba Libre",glass:"Longdrinkglas",method:"Gebouwd",cat:["Rum"],tint:"#e2c3a3",
+ look:{g:"highball",top:"#5b2a14",bot:"#2b1108",ice:"cubes",bubbles:1,garnish:["limewheel"]},
+ taste:"Zoet en verfrissend: de karamel- en vanilletonen van bruine rum en cola, scherp gezet door verse limoen.",
+ fact:"“Cuba Libre” betekent “vrij Cuba”. Het was rond 1900 een toost na de Cubaanse onafhankelijkheidsoorlog, toen Amerikaanse cola net op het eiland was aangekomen.",
+ ing:[[1,"","partje limoen","","partjes limoen"],[50,"ml","bruine rum"],[[100,150],"ml","cola"],[null,"","ijsblokjes"],[1,"","schijfje limoen","g","schijfjes limoen"]],
+ tools:["Longdrinkglas","Muddler (stamper)","Jigger (maatbekertje)","Barlepel","Mes en snijplank"],
+ prep:[],
+ steps:["Knijp {0} uit in het glas en kneus het kort met de muddler.","Vul het glas met {3}.","Schenk {1} over het ijs.","Vul aan met {2} en roer kort.","Garneer met {4}."]},
+
+{id:"daiquiri",name:"Daiquiri",glass:"Martiniglas",method:"Shaker",cat:["Rum"],tint:"#d6e5b6",
+ look:{g:"martini",top:"#f1f4d8",bot:"#dbe5ab",garnish:["limewedge"]},
+ taste:"Puur en uitgebalanceerd: enkel rum, limoen en suiker. Zuur, zoet en droog in perfecte balans, met de zachte tonen van witte rum.",
+ fact:"De Daiquiri is genoemd naar een strand en mijnstadje bij Santiago de Cuba. Ernest Hemingway dronk ze in bar El Floridita in Havana, vaak meerdere op één avond.",
+ ing:[[20,"ml","limoensap"],[10,"ml","suikerwater"],[60,"ml","witte rum"],[null,"","ijsblokjes"],[1,"","limoenpartje","g","limoenpartjes"]],
+ tools:["Martiniglas","Cocktailshaker","Jigger (maatbekertje)","Strainer","Fijn zeefje","Citruspers"],
+ prep:["Koel het martiniglas voor in de vriezer of met ijs en water."],
+ steps:["Doe {0}, {1} en {2} in de shaker.","Vul de shaker met {3}.","Shake krachtig zo'n 10 seconden.","Gooi het ijs uit het voorgekoelde glas.","Giet af door de strainer én het fijne zeefje in het martiniglas.","Garneer met {4} op de rand."]},
+
+{id:"dark-n-stormy",name:"Dark 'n Stormy",glass:"Tumbler (laag)",method:"Gebouwd",cat:["Rum"],tint:"#c9d2d9",
+ look:{g:"tumbler",top:"#e3b46e",bot:"#c98a3e",float:["#3a1508",.34],ice:"cubes",bubbles:1,garnish:["limewedge"]},
+ taste:"Pittig en warm: scherpe gember en limoen onderaan, rijke donkere rum bovenop. Elke slok wordt iets voller naarmate je dieper drinkt.",
+ fact:"De naam is in de VS een gedeponeerd handelsmerk van rumhuis Gosling's uit Bermuda. Volgens hun eigen regels hoort er strikt genomen Gosling's Black Seal-rum in.",
+ ing:[[2,"dash","Angostura bitter"],[20,"ml","limoensap"],[120,"ml","ginger beer"],[50,"ml","bruine rum"],[null,"","ijsblokjes"],[1,"","limoenpartje","g","limoenpartjes"]],
+ tools:["Tumbler","Jigger (maatbekertje)","Barlepel","Citruspers","Mes en snijplank"],
+ prep:["Vul het glas met {4}."],
+ steps:["Sprenkel {0} op het ijs.","Voeg {1} toe.","Schenk {2} erbij.","Laat {3} langzaam over de bolle kant van een barlepel lopen, zodat de rum als een donkere stormwolk bovenop blijft drijven.","Leg {5} in het glas."]},
+
+{id:"el-diablo",name:"El Diablo",glass:"Longdrinkglas",method:"Shaker",cat:["Tequila"],tint:"#e6b3c3",
+ look:{g:"highball",top:"#c22e5b",bot:"#6a1240",ice:"cubes",bubbles:1,garnish:["limewheel"]},
+ taste:"Fruitig met een duivels randje: zwarte bes en agave, opgetild door frisse limoen en de prik van ginger beer.",
+ fact:"Het recept verscheen in 1946 in een boek van Trader Vic, toen nog als “Mexican El Diablo”. Het is een van de eerste gedrukte tequilacocktails.",
+ ing:[[35,"ml","tequila"],[15,"ml","crème de cassis"],[15,"ml","limoensap"],[null,"","ijsblokjes"],[null,"","ginger beer (om aan te vullen)"],[1,"","schijfje limoen","g","schijfjes limoen"]],
+ tools:["Longdrinkglas","Cocktailshaker","Jigger (maatbekertje)","Strainer","Citruspers","Mes en snijplank"],
+ prep:[],
+ steps:["Doe {0}, {1} en {2} in de shaker.","Vul de shaker met {3} en shake 8 à 10 seconden.","Vul het longdrinkglas met verse ijsblokjes.","Zeef de cocktail over het ijs.","Vul aan met {4}.","Garneer met {5}."]},
+
+{id:"gin-fizz",name:"Gin Fizz",glass:"Tumbler of longdrinkglas",method:"Shaker",cat:["Gin"],tint:"#cfdde4",
+ look:{g:"highball",top:"#f7f5e6",bot:"#e4e2c8",bubbles:1,foam:4,garnish:[]},
+ taste:"Licht, citrusfris en bruisend: een soort volwassen limonade met de kruidige botanicals van gin.",
+ fact:"In New Orleans werd de Ramos Gin Fizz, een variant met eiwit en room, zo lang geschud dat bars rond 1915 rijen “shaker boys” inzetten die de shaker van hand tot hand doorgaven.",
+ ing:[[50,"ml","dry gin"],[30,"ml","citroensap"],[2,"tl","poedersuiker"],[null,"","ijsblokjes"],[20,"ml","spuitwater"]],
+ tools:["Tumbler of longdrinkglas","Cocktailshaker","Jigger (maatbekertje)","Strainer","Citruspers","Theelepel"],
+ prep:["Koel het glas voor in de vriezer."],
+ steps:["Doe {0}, {1} en {2} in de shaker en roer even tot de suiker oplost.","Vul de shaker met {3}.","Shake krachtig 10 à 15 seconden.","Zeef in het gekoelde glas. Let op: geen ijs in het glas.","Vul aan met ongeveer {4}; de cocktail gaat licht bruisen."]},
+
+{id:"gin-tonic",name:"Gin Tonic",glass:"Longdrinkglas",method:"Gebouwd",cat:["Gin"],tint:"#c4dde1",
+ look:{g:"highball",top:"#f1f8f5",bot:"#d8ebe5",ice:"cubes",bubbles:1,garnish:["limewheel"]},
+ taste:"Droog, bitter en kraakhelder: de kinine van de tonic tegenover de jeneverbes en kruiden van de gin, met een frisse limoentoets.",
+ fact:"Tonic bevat kinine, dat Britse koloniale soldaten tegen malaria dronken. Diezelfde kinine laat je gin-tonic blauw oplichten onder uv- of blacklight.",
+ ing:[[50,"ml","gin"],[20,"ml","limoensap"],[1,"","flesje tonic","","flesjes tonic"],[null,"","schijfje limoen of komkommer","g"],[null,"","ijsblokjes"]],
+ tools:["Longdrinkglas","Jigger (maatbekertje)","Barlepel","Citruspers","Mes en snijplank"],
+ prep:["Vul het glas tot de rand met {4}."],
+ steps:["Schenk {0} over het ijs.","Voeg {1} toe.","Giet {2} langs de spiraal van een barlepel in het glas, zo behoud je de meeste bubbels.","Roer één keer zacht van onder naar boven.","Garneer met een {3}."]},
+
+{id:"kir-royal",name:"Kir Royal",glass:"Champagneglas (fluitje)",method:"Schenken",cat:["Bubbels"],tint:"#e2b8c6",
+ look:{g:"flute",top:"#c62e55",bot:"#7a0f2e",bubbles:1,garnish:[]},
+ taste:"Elegant en fruitig: sappige zwarte bes met droge, bruisende prosecco. Zoeter dan pure prosecco, maar nooit zwaar.",
+ fact:"De Kir is genoemd naar Félix Kir, kanunnik en burgemeester van Dijon, die na de Tweede Wereldoorlog witte wijn met cassis schonk om lokale producten te promoten. Met bubbels in plaats van witte wijn wordt het een “Royal”.",
+ note:"Je Excel noemt geen hoeveelheden. Ik gebruikte de gangbare verhouding van ongeveer 1 deel cassis op 8 delen bubbels.",
+ ing:[[120,"ml","prosecco, gekoeld"],[15,"ml","crème de cassis"]],
+ tools:["Champagneglas (fluitje)","Jigger (maatbekertje)"],
+ prep:[],
+ steps:["Houd het fluitje schuin en schenk {0} in.","Laat er {1} in lopen; de likeur zakt en mengt vanzelf tot een dieprode kleur.","Serveer meteen. Roeren is niet nodig."]},
+
+{id:"lazy-red-cheeks",name:"Lazy Red Cheeks",glass:"Tumbler",method:"Gebouwd",cat:["Vodka"],tint:"#f0bccd",
+ look:{g:"tumbler",top:"#e54670",bot:"#a3154a",ice:"crushed",garnish:["limewedge","raspberry"]},
+ taste:"Zoetzuur en fruitig: verse frambozen en limoen met een bloemige toets van viooltjessiroop. Gevaarlijk makkelijk drinkbaar.",
+ fact:"Een framboos is botanisch gezien geen bes. Het is een verzamelvrucht van tientallen piepkleine steenvruchtjes, elk met een eigen pitje.",
+ ing:[[6,"","verse frambozen"],[1,"tl","rietsuiker"],[10,"ml","violetsiroop"],[45,"ml","vodka"],[10,"ml","suikerwater"],[40,"ml","limoensap"],[null,"","crushed ijs"],[1,"","limoenpartje","g","limoenpartjes"]],
+ tools:["Tumbler","Muddler (stamper)","Jigger (maatbekertje)","Barlepel","Citruspers","Mes en snijplank"],
+ prep:["Leg {0} in het glas."],
+ steps:["Voeg {1} en {2} toe.","Muddle (kneus) alles stevig tot een grove puree.","Schenk {3}, {4} en {5} erbij.","Vul het glas tot boven met {6} en roer goed door met de barlepel.","Garneer met {7} op de rand."]},
+
+{id:"limoncello-spritz",name:"Limoncello Spritz",glass:"Groot wijnglas",method:"Gebouwd",cat:["Bubbels"],tint:"#f3e39c",
+ look:{g:"wine",top:"#fff3a6",bot:"#f1d046",ice:"cubes",bubbles:1,garnish:["lemon"]},
+ taste:"Zonnig en zacht: zoete citroen van de limoncello, verlengd met droge bubbels. Frisser en minder bitter dan een Aperol Spritz.",
+ fact:"Limoncello komt van de Amalfikust en Sorrento. Er gaat alleen de schil van de citroen in, niet het sap. Die schillen trekken weken in alcohol voor er suikerwater bij komt.",
+ ing:[[90,"ml","prosecco"],[60,"ml","limoncello"],[30,"ml","spuitwater"],[null,"","ijsblokjes"],[1,"","citroenpartje","g","citroenpartjes"]],
+ tools:["Groot wijnglas","Jigger (maatbekertje)","Barlepel","Mes en snijplank"],
+ prep:[],
+ steps:["Vul het wijnglas royaal met {3}.","Schenk {0} over het ijs.","Voeg {1} toe.","Top af met {2}.","Roer één keer kort en zacht.","Garneer met {4}."]},
+
+{id:"mai-tai",name:"Mai Tai",glass:"Tumbler",method:"Shaker",cat:["Rum"],tint:"#efcf9f",
+ look:{g:"tumbler",top:"#e7a447",bot:"#c06b1f",float:["#6a2a0c",.2],ice:"crushed",garnish:["limewheel","mint"]},
+ taste:"Tropisch en vol: rum, amandel en sinaasappel met een frisse zure kant. De donkere rum bovenop geeft diepte aan elke eerste slok.",
+ fact:"Trader Vic maakte de eerste Mai Tai in 1944 in Oakland. Een Tahitiaanse gast riep bij de eerste slok “Maita'i roa ae!”, Tahitiaans voor “buitengewoon goed”.",
+ ing:[[[40,45],"ml","witte rum"],[20,"ml","Cointreau"],[20,"ml","limoensap"],[[15,20],"ml","orgeat (amandelsiroop)"],[null,"","crushed ijs"],[[15,30],"ml","bruine rum"],[null,"","limoen en een takje munt","g"]],
+ tools:["Tumbler","Cocktailshaker","Jigger (maatbekertje)","Barlepel","Citruspers","Mes en snijplank"],
+ prep:["Koel het glas voor in de vriezer."],
+ steps:["Doe {0}, {1}, {2} en {3} in de shaker.","Voeg {4} toe en shake kort en krachtig.","Giet alles, ijs inbegrepen, in het voorgekoelde glas.","Laat {5} over de bolle kant van een barlepel bovenop drijven.","Garneer met {6}."]},
+
+{id:"margarita",name:"Margarita Classic",glass:"Martiniglas",method:"Shaker",cat:["Tequila"],tint:"#d3e6b0",
+ look:{g:"martini",top:"#f0f6c8",bot:"#d2e48c",salt:1,garnish:["limewedge"]},
+ taste:"Zuur, zoutig en citrusfris: de aardse agave van tequila, sinaasappel van Cointreau en veel limoen, met bij elke slok een randje zout.",
+ fact:"In 1971 bouwde Mariano Martinez in Dallas een oude softijsmachine om tot de eerste frozen-margaritamachine. Die machine staat vandaag in het Smithsonian-museum.",
+ tip:"Variant uit je recept: 40 ml tequila, 40 ml Cointreau en 40 ml limoensap. Die versie is zachter en zoeter.",
+ ing:[[60,"ml","tequila"],[30,"ml","Cointreau"],[30,"ml","limoensap"],[null,"","ijsblokjes"],[null,"","halve limoen en grof zeezout (voor de rand)"],[1,"","limoenpartje","g","limoenpartjes"]],
+ tools:["Martiniglas","Cocktailshaker","Jigger (maatbekertje)","Strainer","Citruspers","Bordje voor het zout","Mes en snijplank"],
+ prep:["Koel het martiniglas voor.","Wrijf een halve limoen over de rand van het glas en dip de rand in grof zeezout."],
+ steps:["Doe {0}, {1} en {2} in de shaker.","Vul met {3} en shake krachtig zo'n 10 seconden.","Zeef in het glas met de zoutrand.","Garneer met {5}."]},
+
+{id:"mojito",name:"Mojito",virgin:"optie",glass:"Tumbler",method:"Gebouwd",cat:["Rum","Alcoholvrij"],tint:"#c9e3c0",
+ look:{g:"tumbler",top:"#eef7e2",bot:"#cbe4ae",ice:"crushed",bubbles:1,garnish:["limewheel","mint"]},
+ taste:"Fris, zoet en kruidig: verse munt en limoen met rietsuiker. Met witte rum klassiek Cubaans, met Sprite een heerlijke alcoholvrije versie.",
+ fact:"Kneus munt zacht in plaats van ze te verpulveren. De geurige muntolie zit in kliertjes aan het oppervlak van het blad; wie te hard stampt, maakt bittere stoffen uit de nerven vrij.",
+ ing:[[[8,10],"","muntblaadjes"],[.5,"tl","rietsuiker"],[20,"ml","limoensap"],[60,"ml","witte rum (of Sprite voor de virgin)"],[20,"ml","rietsuikersiroop"],[1,"","schijfje limoen","","schijfjes limoen"],[null,"","ijs (crushed of blokjes)"],[20,"ml","bruiswater"],[1,"","takje munt","g","takjes munt"]],
+ tools:["Tumbler","Muddler (stamper)","Jigger (maatbekertje)","Barlepel","Citruspers","Mes en snijplank"],
+ prep:["Leg {0} met {1} in het glas."],
+ steps:["Kneus de munt zacht met de muddler, net genoeg om de geur vrij te maken.","Voeg {2} toe.","Schenk {3} en {4} erbij.","Knijp {5} uit boven het glas en laat het erin vallen.","Vul het glas met {6} en roer goed.","Top af met {7}.","Garneer met {8}."]},
+
+{id:"moscow-mule",name:"Moscow Mule",glass:"Koperen beker",method:"Gebouwd",cat:["Vodka"],tint:"#e6c0a2",
+ look:{g:"mug",top:"#ece0b4",ice:"cubes",garnish:["limewedge","mint"]},
+ taste:"Pittig en verkwikkend: scherpe gember, frisse limoen en een neutrale vodkabasis. Uit de koperen beker blijft hij extra ijskoud.",
+ fact:"De Moscow Mule ontstond rond 1941 in Los Angeles, toen een vodka-importeur en een ginger-beerproducent samen hun slecht verkopende dranken probeerden te slijten. De koperen beker werd hun herkenningsteken.",
+ note:"In je Excel staat 20 cl limoensap; dat is vermoedelijk 20 ml, dus zo staat het hier.",
+ ing:[[50,"ml","vodka"],[120,"ml","ginger beer"],[20,"ml","limoensap"],[2,"dash","Angostura bitter"],[null,"","1 à 2 takjes munt en limoen","g"],[null,"","ijsblokjes"]],
+ tools:["Koperen beker","Jigger (maatbekertje)","Barlepel","Citruspers","Mes en snijplank"],
+ prep:["Vul de koperen beker met {5}."],
+ steps:["Schenk {0} over het ijs.","Voeg {1} toe.","Voeg {2} toe.","Sprenkel er {3} over.","Roer kort met de barlepel en garneer met {4}."]},
+
+{id:"pineapple-ginger-fizz",name:"Pineapple Ginger Fizz",virgin:true,glass:"Tumbler of longdrinkglas",method:"Shaker",cat:["Alcoholvrij"],tint:"#f4dc9b",
+ look:{g:"highball",top:"#ffe07e",bot:"#f2b234",foam:6,ice:"cubes",bubbles:1,garnish:["mint"]},
+ taste:"Zonnig en fris, zonder alcohol: zoete ananas, zure limoen en de warme prik van gember.",
+ fact:"Ananas bevat bromelaïne, een enzym dat eiwitten afbreekt. Daarom kan verse ananas tintelen op je tong, en daarom schuimt ananassap zo mooi als je het shaket.",
+ ing:[[100,"ml","ananassap"],[20,"ml","limoensap"],[15,"ml","agavesiroop of suikerwater"],[null,"","ijsblokjes"],[60,"ml","ginger beer"],[1,"","takje munt","g","takjes munt"]],
+ tools:["Tumbler of longdrinkglas","Cocktailshaker","Jigger (maatbekertje)","Strainer","Barlepel","Citruspers"],
+ prep:[],
+ steps:["Doe {0}, {1} en {2} in de shaker.","Vul met {3} en shake krachtig zo'n 10 seconden. Het ananassap geeft zo een mooie schuimkraag.","Zeef in het glas.","Voeg verse ijsblokjes toe.","Top af met {4}, langs de barlepel.","Garneer met {5}."]},
+
+{id:"pornstar-martini",name:"Pornstar Martini",glass:"Cocktailglas (coupe)",method:"Shaker",cat:["Vodka"],tint:"#f3d397",
+ look:{g:"coupe",top:"#f8c94e",bot:"#e39320",foam:9,garnish:["passion"]},
+ taste:"Zoet, tropisch en zijdezacht: passievrucht en vanille met een frisse zure toets en een romige schuimlaag.",
+ fact:"Barman Douglas Ankrah bedacht hem in 2002 in Londen. Traditioneel komt er een shotglaasje prosecco naast, om tussendoor van te nippen.",
+ note:"In je Excel staat 20 cl limoensap; dat is vermoedelijk 20 ml, dus zo staat het hier.",
+ ing:[[50,"ml","vanillevodka"],[20,"ml","Passoa"],[60,"ml","passievruchtpuree of -sap"],[20,"ml","limoensap"],[1,"","eiwit","","eiwitten"],[null,"","ijsblokjes"],[1,"","halve passievrucht","g","halve passievruchten"]],
+ tools:["Cocktailglas (coupe)","Cocktailshaker","Jigger (maatbekertje)","Strainer","Mes en snijplank"],
+ prep:[],
+ steps:["Doe {0}, {1}, {2}, {3} en {4} in de shaker.","Tip: shake eerst 10 seconden zonder ijs (dry shake) voor een stevigere schuimlaag.","Vul met {5} en shake krachtig 10 à 15 seconden.","Zeef in het cocktailglas.","Leg {6} bovenop het schuim."]},
+
+{id:"prosecco",name:"Prosecco",glass:"Champagneglas (fluitje)",method:"Schenken",cat:["Bubbels"],tint:"#e9dfb3",
+ look:{g:"flute",top:"#f7eab0",bot:"#e6cb67",bubbles:1,garnish:[]},
+ taste:"Droog tot licht zoet, fris en fruitig: tonen van groene appel, peer en witte bloemen, met fijne levendige bubbels.",
+ fact:"Prosecco krijgt zijn bubbels in grote stalen tanks (de charmatmethode), champagne in de fles zelf. Daardoor blijft prosecco fruitiger en jeugdiger. De druif heet glera.",
+ note:"In je Excel staan geen stappen voor prosecco. Dit is de gangbare manier van schenken.",
+ ing:[[120,"ml","prosecco"]],
+ tools:["Champagneglas (fluitje)","Koelemmer of koelkast"],
+ prep:["Koel de fles tot 6 à 8 °C: een paar uur in de koelkast of 20 minuten in een emmer met ijs en water."],
+ steps:["Draai de kurk los terwijl je de fles schuin houdt. De kurk moet zacht zuchten, niet knallen.","Houd het fluitje schuin en schenk {0} in twee keer in, zodat het schuim kan zakken."]},
+
+{id:"tommys-margarita",name:"Tommy's Margarita",glass:"Tumbler",method:"Shaker",cat:["Tequila"],tint:"#d8e5b0",
+ look:{g:"tumbler",top:"#f0f5cb",bot:"#d5e197",ice:"cubes",salt:1,garnish:["limewheel"]},
+ taste:"Zuiverder en zachter dan de klassieker: agavesiroop in plaats van sinaasappellikeur laat de tequila zelf meer spreken.",
+ fact:"Julio Bermejo bedacht hem begin jaren '90 in Tommy's, het Mexicaanse restaurant van zijn ouders in San Francisco. Agavesiroop komt van dezelfde plant als tequila.",
+ ing:[[40,"ml","tequila"],[15,"ml","agavesiroop"],[30,"ml","limoensap"],[null,"","ijsblokjes"],[null,"","halve limoen en grof zeezout (voor de rand)","g"]],
+ tools:["Tumbler","Cocktailshaker","Jigger (maatbekertje)","Strainer","Citruspers","Bordje voor het zout"],
+ prep:["Wrijf een halve limoen over de rand van het glas en dip de rand in grof zeezout."],
+ steps:["Doe {0}, {1} en {2} in de shaker.","Vul met {3} en shake krachtig zo'n 10 seconden.","Vul de tumbler met vers ijs en zeef de cocktail erover."]},
+
+{id:"white-russian",name:"White Russian",glass:"Tumbler",method:"Gebouwd",cat:["Vodka"],tint:"#d9c6ae",
+ look:{g:"tumbler",top:"#7a4a2a",bot:"#3a1e10",float:["#f6ecdc",.32],ice:"cubes",garnish:[]},
+ taste:"Romig en zoet, als ijskoffie met een stevige basis: koffie, vanille en karamel onder een zachte roomlaag.",
+ fact:"Zonder room heet hij Black Russian, bedacht in 1949 in Hotel Métropole in Brussel. Wereldberoemd werd de White Russian als lievelingsdrank van The Dude in de film The Big Lebowski.",
+ note:"Je Excel noemt geen hoeveelheid room; 30 ml is een gangbare hoeveelheid.",
+ ing:[[50,"ml","vodka"],[40,"ml","koffielikeur"],[30,"ml","room"],[null,"","ijsblokjes"]],
+ tools:["Tumbler","Jigger (maatbekertje)","Barlepel","Kleine garde of lege shaker (voor de room)"],
+ prep:["Vul het glas met {3}."],
+ steps:["Schenk {0} over het ijs.","Voeg {1} toe.","Roer kort met de barlepel.","Klop {2} licht op tot ze iets dikker is maar nog vloeit.","Laat de room langzaam over de bolle kant van een barlepel bovenop drijven."]}
+];
+
+/* ---------- Illustraties (SVG) ---------- */
+const GL={
+ martini:{bowl:"M36,54 L164,54 L100,134 Z",stem:[134,196],foot:34,level:64,rim:[36,164,54],base:134},
+ coupe:{bowl:"M38,62 L162,62 C162,112 134,134 100,134 C66,134 38,112 38,62 Z",stem:[134,196],foot:34,level:72,rim:[38,162,62],base:134},
+ flute:{bowl:"M78,24 L122,24 C124,88 120,128 100,142 C80,128 76,88 78,24 Z",stem:[142,196],foot:30,level:40,rim:[78,122,24],base:142},
+ wine:{bowl:"M56,40 L144,40 C156,92 150,142 100,146 C50,142 44,92 56,40 Z",stem:[146,196],foot:34,level:64,rim:[56,144,40],base:146},
+ highball:{bowl:"M62,30 L138,30 L133,198 L67,198 Z",level:48,rim:[62,138,30],base:198,thick:10},
+ tumbler:{bowl:"M46,92 L154,92 L148,198 L52,198 Z",level:106,rim:[46,154,92],base:198,thick:12},
+ mug:{rim:[54,146,82],level:86,base:198}
+};
+function rng(seed){let s=seed%2147483647;if(s<=0)s+=2147483646;return()=>(s=s*16807%2147483647)/2147483647}
+function hash(str){let h=7;for(const ch of str)h=(h*31+ch.charCodeAt(0))>>>0;return h}
+
+function wheel(x,y,r,col,inner,rot=0){
+  let s=`<g transform="translate(${x},${y}) rotate(${rot})"><circle r="${r}" fill="${col}"/><circle r="${r-3}" fill="${inner}"/>`;
+  for(let i=0;i<8;i++){const a=i*Math.PI/4;s+=`<line x1="0" y1="0" x2="${((r-3)*Math.cos(a)).toFixed(1)}" y2="${((r-3)*Math.sin(a)).toFixed(1)}" stroke="${col}" stroke-width="1.6" opacity=".55"/>`}
+  return s+`<circle r="2.2" fill="${col}" opacity=".6"/></g>`;
+}
+function wedge(x,y,r,col,inner,rot){
+  return `<g transform="translate(${x},${y}) rotate(${rot})"><path d="M${-r},0 A${r},${r} 0 0 0 ${r},0 Z" fill="${col}"/><path d="M${-r+3},0 A${r-3},${r-3} 0 0 0 ${r-3},0 Z" fill="${inner}"/>`+
+  [30,60,90,120,150].map(a=>{const t=a*Math.PI/180;return `<line x1="0" y1="0" x2="${((r-3)*Math.cos(t)).toFixed(1)}" y2="${((r-3)*Math.sin(t)).toFixed(1)}" stroke="${col}" stroke-width="1.4" opacity=".5"/>`}).join("")+`</g>`;
+}
+function leaf(x,y,rot,len=16){return `<g transform="translate(${x},${y}) rotate(${rot})"><path d="M0,0 C${len*.35},${-len*.45} ${len*.8},${-len*.35} ${len},0 C${len*.8},${len*.35} ${len*.35},${len*.45} 0,0 Z" fill="#3f9a4e"/><path d="M1,0 L${len-2},0" stroke="#2c7a3b" stroke-width="1"/></g>`}
+
+function art(c,pfx){
+  const L=c.look,g=GL[L.g],id=pfx+c.id,r=rng(hash(c.id)+3);
+  const [rl,rr,ry]=g.rim;
+  let s=`<svg viewBox="0 0 200 220" role="img" aria-label="Illustratie van een ${c.name}"><defs>
+  <linearGradient id="${id}l" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${L.top}"/><stop offset="1" stop-color="${L.bot||L.top}"/></linearGradient>
+  <linearGradient id="${id}cu" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9a4f22"/><stop offset=".3" stop-color="#e09a5c"/><stop offset=".45" stop-color="#f4c08d"/><stop offset=".7" stop-color="#b8662e"/><stop offset="1" stop-color="#7e3c18"/></linearGradient>`;
+  if(g.bowl)s+=`<clipPath id="${id}c"><path d="${g.bowl}"/></clipPath>`;
+  s+=`</defs>`;
+  s+=`<circle cx="100" cy="112" r="88" fill="#ffffff" opacity=".22"/>`;
+  s+=`<ellipse cx="100" cy="206" rx="${L.g==="mug"?56:44}" ry="6" fill="#000" opacity=".12"/>`;
+
+  if(L.g==="mug"){
+    // handle
+    s+=`<path d="M144,108 C176,106 178,170 142,168" fill="none" stroke="url(#${id}cu)" stroke-width="11" stroke-linecap="round"/>`;
+    // ice above rim
+    if(L.ice)for(let i=0;i<4;i++){const x=64+i*19+r()*6,y=66+r()*10;s+=`<rect x="${x}" y="${y}" width="22" height="22" rx="4" transform="rotate(${(r()*40-20).toFixed(0)} ${x+11} ${y+11})" fill="#ffffff" opacity=".7" stroke="#ffffff"/>`}
+    s+=`<ellipse cx="100" cy="84" rx="44" ry="7" fill="${L.top}"/>`;
+    s+=`<path d="M54,82 L146,82 L140,200 L60,200 Z" fill="url(#${id}cu)"/>`;
+    s+=`<ellipse cx="100" cy="82" rx="46" ry="6" fill="none" stroke="#f6c896" stroke-width="3"/>`;
+    s+=`<path d="M58,96 L142,96" stroke="#7e3c18" stroke-width="2" opacity=".5"/><path d="M60,186 L140,186" stroke="#7e3c18" stroke-width="2" opacity=".5"/>`;
+    s+=`<path d="M70,104 L68,180" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".35"/>`;
+  } else {
+    const lv=g.level, bot=g.base;
+    // stem and foot
+    if(g.stem){s+=`<path d="M100,${g.stem[0]} L100,${g.stem[1]}" stroke="#ffffff" stroke-width="5" opacity=".75"/><path d="M100,${g.stem[0]} L100,${g.stem[1]}" stroke="#000" stroke-width="1" opacity=".12"/>`;
+      s+=`<ellipse cx="100" cy="${g.stem[1]+3}" rx="${g.foot}" ry="5.5" fill="#ffffff" opacity=".75" stroke="#000" stroke-opacity=".12"/>`}
+    s+=`<g clip-path="url(#${id}c)">`;
+    s+=`<rect x="0" y="${lv}" width="200" height="${bot-lv+2}" fill="url(#${id}l)"/>`;
+    if(L.float){const h=(bot-lv)*L.float[1];s+=`<rect x="0" y="${lv}" width="200" height="${h}" fill="${L.float[0]}"/><rect x="0" y="${lv+h-3}" width="200" height="6" fill="${L.float[0]}" opacity=".5"/>`}
+    if(L.foam){s+=`<rect x="0" y="${lv-1}" width="200" height="${L.foam}" fill="#fffaf0" opacity=".92"/>`}
+    if(L.bubbles){for(let i=0;i<22;i++){const x=40+r()*120,y=lv+8+r()*(bot-lv-12);s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(0.8+r()*1.8).toFixed(1)}" fill="#ffffff" opacity="${(0.35+r()*.4).toFixed(2)}"/>`}}
+    if(L.ice==="cubes"){const n=L.g==="highball"?5:L.g==="wine"?4:3;for(let i=0;i<n;i++){const x=(L.g==="highball"?72+r()*36:58+i*(80/n)+r()*10),y=(L.g==="highball"?lv-4+i*28+r()*6:lv-6+r()*26);const w=L.g==="highball"?28:26;s+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w}" height="${w}" rx="5" transform="rotate(${(r()*40-20).toFixed(0)} ${x+w/2} ${y+w/2})" fill="#ffffff" opacity=".32" stroke="#ffffff" stroke-opacity=".75" stroke-width="1.5"/>`}}
+    if(L.ice==="crushed"){for(let i=0;i<34;i++){const x=48+r()*104,y=lv-8+r()*(bot-lv)*.75,w=6+r()*9;s+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${(w*.8).toFixed(1)}" rx="2" transform="rotate(${(r()*90).toFixed(0)} ${x} ${y})" fill="#ffffff" opacity="${(0.3+r()*.35).toFixed(2)}"/>`}}
+    if(g.thick)s+=`<rect x="0" y="${bot-g.thick}" width="200" height="${g.thick}" fill="#ffffff" opacity=".35"/>`;
+    s+=`</g>`;
+    // glass
+    s+=`<path d="${g.bowl}" fill="#ffffff" fill-opacity=".1" stroke="#000" stroke-opacity=".14" stroke-width="4.5" stroke-linejoin="round"/>`;
+    s+=`<path d="${g.bowl}" fill="none" stroke="#ffffff" stroke-opacity=".95" stroke-width="2.2" stroke-linejoin="round"/>`;
+    // highlight
+    s+=`<path d="M${rl+9},${ry+8} L${rl+(L.g==="martini"?32:11)},${ry+(L.g==="martini"?38:Math.min(70,(bot-ry)*.6))}" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity=".5"/>`;
+    if(L.salt){for(let i=0;i<34;i++){const x=rl+3+r()*(rr-rl-6);s+=`<circle cx="${x.toFixed(1)}" cy="${(ry-1+r()*4).toFixed(1)}" r="${(1+r()*1.4).toFixed(1)}" fill="#ffffff" stroke="#9aa3a0" stroke-width=".4"/>`}}
+  }
+  // garnishes
+  (L.garnish||[]).forEach((k,i)=>{
+    const rx=rr-6, rL=rl+14;
+    if(k==="orange")s+=wheel(rx,ry+4,20,"#f07f1a","#ffbe5c",12);
+    if(k==="limewheel")s+=wheel(i? rL:rx,ry+2,17,"#5c9a2d","#c9e58a",-8);
+    if(k==="lemon")s+=wheel(rx,ry+4,19,"#e8c21e","#fff1a0",10);
+    if(k==="limewedge")s+=wedge(rx,ry,17,"#4f8f26","#cfe98f",-38);
+    if(k==="lemontwist")s+=`<path d="M${rr-4},${ry} c10,6 -8,14 4,22 c10,6 -8,14 4,22" fill="none" stroke="#e8b80f" stroke-width="5" stroke-linecap="round"/><path d="M${rr-4},${ry} c10,6 -8,14 4,22 c10,6 -8,14 4,22" fill="none" stroke="#fff3a0" stroke-width="1.6" stroke-linecap="round" opacity=".8"/>`;
+    if(k==="mint"){const x=i?rL:rx-6,y=ry-2;s+=leaf(x,y,-120,18)+leaf(x+2,y,-70,20)+leaf(x-2,y+2,-160,15)+`<path d="M${x},${y+2} L${x+1},${y-14}" stroke="#2c7a3b" stroke-width="1.6"/>`}
+    if(k==="raspberry"){const x=rL+10,y=ry-20;s+=`<line x1="${x}" y1="${y-14}" x2="${x+14}" y2="${y+40}" stroke="#7a5a3a" stroke-width="2"/>`;for(let a=0;a<9;a++){const dx=(a%3)*5-5,dy=Math.floor(a/3)*5-5;s+=`<circle cx="${x+3+dx}" cy="${y+8+dy}" r="3.4" fill="#d3204f" stroke="#a3123a" stroke-width=".8"/>`}}
+    if(k==="passion"){const y=GL[L.g].level-6;s+=`<ellipse cx="100" cy="${y+2}" rx="24" ry="9" fill="#5b1f4f"/><ellipse cx="100" cy="${y}" rx="21" ry="7.5" fill="#f2b62a"/>`;for(let a=0;a<14;a++)s+=`<circle cx="${(86+r()*28).toFixed(1)}" cy="${(y-4+r()*8).toFixed(1)}" r="1.3" fill="#2a1a10"/>`}
+  });
+  return s+`</svg>`;
+}
+
+/* ---------- Helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+function num(v){v=Math.round(v*100)/100;const w=Math.floor(v),f=+(v-w).toFixed(2);const fr={0.5:"½",0.25:"¼",0.75:"¾"}[f];if(fr)return (w||"")+fr;return String(v).replace(".",",")}
+function label(t,n){
+  const [q,u,name,,plural]=t;
+  if(q==null)return {q:"",n:name};
+  const tot=Array.isArray(q)?q[1]*n:q*n;
+  const amt=Array.isArray(q)?num(q[0]*n)+"–"+num(q[1]*n):num(q*n);
+  const many=tot>1;
+  const unit={ml:" ml",tl:" tl",dash:many?" dashes":" dash",glas:many?" glazen":" glaasje","":""}[u];
+  return {q:amt+unit,n:(many&&plural)?plural:name};
+}
+function fill(str,c,n){return esc(str).replace(/\{(\d+)\}/g,(m,i)=>{const t=c.ing[+i];if(!t)return m;const l=label(t,n);return `<b>${esc((l.q?l.q+" ":"")+l.n)}</b>`})}
+
+/* Favorieten (enkel in deze browser) */
+let favs=new Set();
+try{favs=new Set(JSON.parse(localStorage.getItem("favs")||"[]"))}catch(e){}
+function saveFavs(){try{localStorage.setItem("favs",JSON.stringify([...favs]))}catch(e){}}
+
+/* ---------- Overzicht ---------- */
+const FILTERS=[["Alle",()=>true],["♥ Favorieten",c=>favs.has(c.id)],["Met shaker",c=>c.method==="Shaker"],["Zonder shaker",c=>c.method!=="Shaker"],
+ ["Gin",c=>c.cat.includes("Gin")],["Rum",c=>c.cat.includes("Rum")],["Vodka",c=>c.cat.includes("Vodka")],["Tequila",c=>c.cat.includes("Tequila")],["Bubbels",c=>c.cat.includes("Bubbels")],["Alcoholvrij",c=>c.cat.includes("Alcoholvrij")]];
+let active=0;
+$("#chips").innerHTML=FILTERS.map((f,i)=>`<button class="chip" data-i="${i}" aria-pressed="${i===0}">${f[0]}</button>`).join("");
+$("#chips").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;active=+b.dataset.i;document.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",x===b));renderList()});
+$("#q").addEventListener("input",renderList);
+
+function renderList(){
+  const q=$("#q").value.trim().toLowerCase();
+  const list=C.filter(FILTERS[active][1]).filter(c=>!q||(c.name+" "+c.ing.map(t=>t[2]).join(" ")).toLowerCase().includes(q));
+  $("#count").textContent=list.length===C.length?`${C.length} cocktails`:`${list.length} van ${C.length} cocktails`;
+  $("#empty").hidden=list.length>0;
+  $("#grid").innerHTML=list.map(c=>`<button class="card" data-id="${c.id}" aria-current="${!!cur&&cur.id===c.id}" style="--tint:${c.tint}">
+    <div class="art">${art(c,"g-")}${c.virgin===true?'<span class="badge">ALCOHOLVRIJ</span>':c.virgin?'<span class="badge">OOK VIRGIN</span>':""}${favs.has(c.id)?'<span class="fav-dot" aria-label="Favoriet">♥</span>':""}</div>
+    <div class="meta"><h3>${esc(c.name)}</h3><small>${esc(c.glass.replace(/ \(.*\)/,""))} · ${c.method}</small></div></button>`).join("");
+}
+$("#grid").addEventListener("click",e=>{const b=e.target.closest(".card");if(b)open(b.dataset.id)});
+
+/* ---------- Detail ---------- */
+let cur=null,persons=1,tab="need",doneIng=new Set(),doneStep=new Set(),scrollY0=0,lock=null;
+let pushed=false,opened=false;
+function open(id){scrollY0=window.scrollY;pushed=true;location.hash=id}
+function close(){if(pushed){pushed=false;history.back()}else{location.hash=""}}
+
+/* ---------- Cocktailkaart ---------- */
+const SECTIONS=[
+ ["Bubbels & Spritz","Licht en bruisend, om de avond mee te openen.",["prosecco","kir-royal","aperol-spritz","limoncello-spritz"]],
+ ["Fris & citrus","Strakke klassiekers waarin zuur en zoet elkaar in evenwicht houden.",["daiquiri","army-navy","gin-fizz","cosmopolitan"]],
+ ["Agave","Tequila in de hoofdrol, van zout en zuur tot pittig en fruitig.",["margarita","tommys-margarita","el-diablo"]],
+ ["Lang & verfrissend","Highballs met tonic, gember en cola, op veel ijs.",["gin-tonic","moscow-mule","dark-n-stormy","cuba-libre"]],
+ ["Tropisch & fruitig","Rum, munt, frambozen en zon in een glas.",["mai-tai","mojito","lazy-red-cheeks"]],
+ ["Zoet & romig","Voor bij het dessert of als afsluiter.",["pornstar-martini","white-russian"]],
+ ["Zonder alcohol","Alle smaak, geen alcohol. Ook de Mojito kan virgin.",["bellini-night-orient","pineapple-ginger-fizz"]]
+];
+function mainIng(c){
+  return c.ing.filter(t=>!/ijs|^ijsblokjes/i.test(t[2])&&!/grof zeezout/.test(t[2]))
+    .map(t=>t[2].replace(/\s*\(.*?\)/g,"").replace(/, .*$/,"").replace(/^takje /,"").replace(/ \(alcoholvrij\)/,""))
+    .filter((v,i,a)=>a.indexOf(v)===i).slice(0,5).join(" · ");
+}
+function renderKaart(){
+  const by=Object.fromEntries(C.map(c=>[c.id,c]));
+  $("#paper").innerHTML=`<header class="k-cover"><div class="eb">De huisbar · cocktailkaart</div><h2>Cocktails</h2>
+    <p>${C.length} recepten van eigen hand, van een glas bubbels tot een romige afsluiter.</p>
+    <div class="k-toc">${SECTIONS.map(s=>`<span>${s[0]}</span>`).join("")}</div>
+    <div class="k-cover-art">${["aperol-spritz","cosmopolitan","mojito","dark-n-stormy","pornstar-martini"].map(id=>{const c=by[id];return `<span style="background:${c.tint}">${art(c,"kc-")}</span>`}).join("")}</div></header>`+
+  SECTIONS.map(([t,sub,ids],si)=>`<section class="k-sec${si===SECTIONS.length-1?" keep":""}"><div class="k-sec-head"><h3>${t}</h3></div><p class="k-sec-sub">${sub}</p><div class="k-grid">`+
+    ids.map(id=>{const c=by[id];return `<article class="k-item"><div class="k-img" style="background:${c.tint}">${art(c,"k-")}</div><div class="k-body">
+      <h5>${esc(c.name)}${c.virgin===true?"<small>0%</small>":c.virgin?"<small>OOK 0%</small>":""}</h5>
+      <div class="k-ing">${esc(mainIng(c))}</div>
+      <p class="k-taste">${esc(c.taste)}</p>
+      <p class="k-fact">${esc(c.fact)}</p></div></article>`}).join("")+`</div></section>`).join("")+
+  `<div class="k-foot">Proost · geniet met mate</div>`;
+}
+const menu=$("#menu");
+$("#menubtn").addEventListener("click",e=>{e.stopPropagation();menu.hidden=!menu.hidden;$("#menubtn").setAttribute("aria-expanded",!menu.hidden)});
+document.addEventListener("click",e=>{if(!menu.hidden&&!e.target.closest(".menuwrap")){menu.hidden=true;$("#menubtn").setAttribute("aria-expanded","false")}});
+$("#m-kaart").addEventListener("click",()=>{menu.hidden=true;open("kaart")});
+$("#k-back").addEventListener("click",()=>close());
+$("#k-print").addEventListener("click",()=>window.print());
+
+function route(){
+  const id=decodeURIComponent(location.hash.slice(1));
+  if(id==="kaart"){renderKaart();$("#kaart").hidden=false;$("#kaart").scrollTop=0;$("#sheet").hidden=true;document.title="Cocktailkaart";return}
+  $("#kaart").hidden=true;
+  let c=C.find(x=>x.id===id);
+  const wide=WIDE.matches;
+  if(!c&&wide)c=C.find(x=>x.id===lastId)||C[0];
+  if(c)lastId=c.id;
+  document.querySelectorAll(".card").forEach(el=>el.setAttribute("aria-current",String(!!c&&el.dataset.id===c.id)));
+  if(c&&wide){if(!cur||cur.id!==c.id){persons=1;doneIng=new Set();doneStep=new Set()}cur=c;renderDetail();$("#sheet").hidden=false;$("#sheet").scrollTop=0;$("#home").removeAttribute("aria-hidden");document.title=c.name+" · Cocktail Maker";wake();return}
+  if(c){if(!cur||cur.id!==c.id){persons=1;tab="need";doneIng=new Set();doneStep=new Set()}cur=c;opened=true;renderDetail();$("#sheet").hidden=false;$("#sheet").scrollTop=0;$("#home").setAttribute("aria-hidden","true");document.title=c.name+" · Cocktail Maker";wake()}
+  else{cur=null;$("#sheet").hidden=true;$("#home").removeAttribute("aria-hidden");document.title="Cocktail Maker";renderList();window.scrollTo(0,scrollY0);release()}
+}
+window.addEventListener("hashchange",route);
+const WIDE=matchMedia("(min-width:1000px)");let lastId=null;
+WIDE.addEventListener?WIDE.addEventListener("change",route):WIDE.addListener(route);
+
+async function wake(){try{if(!lock&&navigator.wakeLock){lock=await navigator.wakeLock.request("screen");const w=$("#wl");if(w)w.hidden=false;lock.addEventListener("release",()=>{lock=null})}}catch(e){}}
+function release(){try{lock&&lock.release()}catch(e){}lock=null}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&cur)wake()});
+
+const ICON={glass:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 4h14l-7 8z"/><path d="M12 12v7M8 20h8"/></svg>',
+ tool:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 3h8l-1 4H9z"/><path d="M9 7l-1 14h8L15 7"/></svg>',
+ garnish:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16M6.3 6.3l11.4 11.4M17.7 6.3 6.3 17.7" opacity=".55"/></svg>'};
+
+function renderDetail(){
+  const c=cur,n=persons;
+  const ings=c.ing.map((t,i)=>[t,i]).filter(([t])=>t[3]!=="g");
+  const gar=c.ing.filter(t=>t[3]==="g");
+  const allSteps=[...c.prep.map(s=>({p:1,s})),...c.steps.map(s=>({p:0,s}))];
+  const doneN=doneStep.size,total=allSteps.length;
+  let k=0;
+  $("#sheet").style.setProperty("--tint",c.tint);
+  $("#sheet").innerHTML=`
+  <div class="topbar">
+    <button class="iconbtn" id="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>Alle cocktails</button>
+    <button class="iconbtn fav" id="fav" aria-pressed="${favs.has(c.id)}" aria-label="Favoriet"><svg viewBox="0 0 24 24" fill="${favs.has(c.id)?"currentColor":"none"}" stroke="currentColor" stroke-width="2"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>${favs.has(c.id)?"Favoriet":"Bewaar"}</button>
+  </div>
+  <div class="head"><div class="hero">${art(c,"d-")}</div>
+  <div class="intro">
+    <div class="tags">
+      <span class="tag">${esc(c.glass)}</span><span class="tag">${c.method}</span>
+      ${c.virgin===true?'<span class="tag af">Alcoholvrij</span>':c.virgin?'<span class="tag af">Virgin mogelijk</span>':""}
+    </div>
+    <h2 class="d-title">${esc(c.name)}</h2>
+    <p class="taste">${esc(c.taste)}</p>
+    <div class="fact"><span class="k">i</span><p><b>Leuk weetje</b>${esc(c.fact)}</p></div>
+    ${c.note?`<p class="note">${esc(c.note)}</p>`:""}
+  </div></div>
+  <div class="inner">
+    <div class="seg" role="tablist">
+      <button role="tab" id="t-need" aria-selected="${tab==="need"}">Benodigdheden</button>
+      <button role="tab" id="t-steps" aria-selected="${tab==="steps"}">Stappenplan</button>
+    </div>
+
+    <div class="persons"><span>Aantal cocktails</span>
+      <div class="stepper"><button id="minus" aria-label="Minder">−</button><output id="pn">${n} ${n>1?"glazen":"glas"}</output><button id="plus" aria-label="Meer">+</button></div>
+    </div>
+    ${n>2&&c.method==="Shaker"?'<p class="hint">Shake per 2 cocktails tegelijk; een standaardshaker is anders te vol.</p>':""}
+
+    <div class="cols">
+    <section class="col-need" ${tab==="need"?"":"hidden"}>
+      <h3 class="colhead">Benodigdheden</h3>
+      <h4>Ingrediënten</h4>
+      <p class="hint">Tik aan wat je hebt klaargezet.</p>
+      <ul class="list">${ings.map(([t,i])=>{const l=label(t,n);return `<li><button class="check" data-ing="${i}" aria-pressed="${doneIng.has(i)}"><span class="box"></span><span class="txt">${l.q?`<span class="qty">${esc(l.q)}</span>`:""}${esc(l.n)}</span></button></li>`}).join("")}</ul>
+      <h4>Garnituur</h4>
+      <ul class="list">${gar.length?gar.map(t=>{const l=label(t,n);return `<li class="plain">${ICON.garnish}<span class="txt">${esc((l.q?l.q+" ":"")+l.n)}</span></li>`}).join(""):`<li class="plain">${ICON.garnish}<span class="txt">Geen garnituur</span></li>`}</ul>
+      <h4>Materiaal</h4>
+      <ul class="list">${c.tools.map((t,i)=>`<li class="plain">${i===0?ICON.glass:ICON.tool}<span class="txt">${esc(t)}</span></li>`).join("")}</ul>
+    </section>
+
+    <section class="col-steps" ${tab==="steps"?"":"hidden"}>
+      <h3 class="colhead">Stappenplan</h3>
+      <div class="progress"><div class="bar"><i style="width:${total?doneN/total*100:0}%"></i></div><small>${doneN} van ${total}</small></div>
+      <p class="hint">Tik op een stap als hij klaar is.</p>
+      <ol class="steps">${allSteps.map((st,i)=>{const lab=st.p?"V":String(++k);return `<li><button class="step ${st.p?"prep":""}" data-step="${i}" aria-pressed="${doneStep.has(i)}"><span class="num">${doneStep.has(i)?"✓":lab}</span><span class="s-txt">${st.p?'<span class="lbl">Voorbereiding</span>':""}${fill(st.s,c,n)}</span></button></li>`}).join("")}</ol>
+      ${c.tip?`<p class="tip"><b>Tip · </b>${esc(c.tip)}</p>`:""}
+      <p class="cheers ${total&&doneN===total?"on":""}">Proost!</p>
+      <button class="reset" id="reset">Opnieuw beginnen</button>
+      <p class="wl" id="wl" ${lock?"":"hidden"}>Je scherm blijft aan zolang dit recept open staat.</p>
+    </section>
+    </div>
+  </div>`;
+}
+
+$("#sheet").addEventListener("click",e=>{
+  const t=e.target.closest("button");if(!t||!cur)return;
+  if(t.id==="back"){close();return}
+  if(t.id==="fav"){favs.has(cur.id)?favs.delete(cur.id):favs.add(cur.id);saveFavs()}
+  else if(t.id==="t-need")tab="need";
+  else if(t.id==="t-steps")tab="steps";
+  else if(t.id==="minus")persons=Math.max(1,persons-1);
+  else if(t.id==="plus")persons=Math.min(12,persons+1);
+  else if(t.id==="reset")doneStep.clear();
+  else if(t.dataset.ing){const i=+t.dataset.ing;doneIng.has(i)?doneIng.delete(i):doneIng.add(i)}
+  else if(t.dataset.step){const i=+t.dataset.step;doneStep.has(i)?doneStep.delete(i):doneStep.add(i)}
+  else return;
+  const y=$("#sheet").scrollTop;renderDetail();$("#sheet").scrollTop=y;
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&cur)close()});
+
+renderList();
+route();
+if("serviceWorker" in navigator&&location.protocol.startsWith("http")){navigator.serviceWorker.register("sw.js").catch(()=>{})}
+</script>
+</body>
+</html>
