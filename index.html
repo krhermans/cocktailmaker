@@ -273,7 +273,7 @@ a.iconbtn{text-decoration:none}
   <div class="count" id="count"></div>
   <div class="grid" id="grid"></div>
   <div class="empty" id="empty" hidden>Geen cocktails gevonden. Probeer een andere zoekterm of filter.</div>
-  <footer>Recepten gebaseerd op je eigen Cocktail Maker-lijst. Geniet met mate. · Versie 1.2</footer>
+  <footer>Recepten gebaseerd op je eigen Cocktail Maker-lijst. Geniet met mate. · Versie 1.3</footer>
 </div>
 
 <div class="sheet" id="sheet" hidden></div>
@@ -363,6 +363,17 @@ const C = [
  prep:[],
  steps:["Doe {0}, {1} en {2} in de shaker.","Vul de shaker met {3} en shake 8 à 10 seconden.","Vul het longdrinkglas met verse ijsblokjes.","Zeef de cocktail over het ijs.","Vul aan met {4}.","Garneer met {5}."]},
 
+{id:"espresso-martini",name:"Espresso Martini",glass:"Martiniglas",method:"Shaker",cat:["Vodka"],tint:"#d8c2aa",
+ look:{g:"martini",top:"#3d2216",bot:"#1d0e07",foam:8,foamc:"#d6ad7f",garnish:["beans"]},
+ taste:"Bitter, zoet en energiek: sterke koffie, koffielikeur en vodka onder een romige, fluweelzachte schuimlaag.",
+ fact:"Barman Dick Bradsell bedacht hem eind jaren '80 in Londen, toen een bekend model aan de bar vroeg om een drankje dat haar wakker zou maken én zin zou geven om te feesten.",
+ note:"In je recept staat 20 cl Kahlúa, 30 cl espresso en 10 cl suikerwater. Dat is vermoedelijk ml, dus zo staat het hier.",
+ tip:"De drie koffiebonen staan volgens Italiaanse traditie voor gezondheid, geluk en voorspoed.",
+ ing:[[30,"ml","vodka"],[20,"ml","Kahlúa (koffielikeur)"],[30,"ml","ijskoude espresso"],[10,"ml","suikerwater"],[null,"","ijsblokjes"],[3,"","koffiebonen","g"]],
+ tools:["Martiniglas","Cocktailshaker","Jigger (maatbekertje)","Strainer","Espressomachine of moka"],
+ prep:["Zet de espresso en laat hem goed afkoelen.","Koel het martiniglas voor met crushed ijs."],
+ steps:["Doe {0}, {1}, {2} en {3} in de shaker.","Vul met {4}, sluit af en shake krachtig zo'n 15 seconden. Zo krijg je een mooie schuimlaag.","Gooi het crushed ijs uit het glas.","Zeef de cocktail in het martiniglas.","Leg {5} op het schuim."]},
+
 {id:"gin-fizz",name:"Gin Fizz",glass:"Tumbler of longdrinkglas",method:"Shaker",cat:["Gin"],tint:"#cfdde4",
  look:{g:"highball",top:"#f7f5e6",bot:"#e4e2c8",bubbles:1,foam:4,garnish:[]},
  taste:"Licht, citrusfris en bruisend: een soort volwassen limonade met de kruidige botanicals van gin.",
@@ -380,6 +391,15 @@ const C = [
  tools:["Longdrinkglas","Jigger (maatbekertje)","Barlepel","Citruspers","Mes en snijplank"],
  prep:["Vul het glas tot de rand met {4}."],
  steps:["Schenk {0} over het ijs.","Voeg {1} toe.","Giet {2} langs de spiraal van een barlepel in het glas, zo behoud je de meeste bubbels.","Roer één keer zacht van onder naar boven.","Garneer met een {3}."]},
+
+{id:"godfather",name:"Godfather",glass:"Old-fashioned-glas (tumbler)",method:"Geroerd",cat:["Whisky"],tint:"#e9cfa4",
+ look:{g:"tumbler",top:"#d0903e",bot:"#8f5418",ice:"cubes",garnish:["orangetwist"]},
+ taste:"Warm en zijdezacht: de moutige, licht rokerige tonen van scotch met de zoete amandel en marsepein van amaretto. Een echte afsluiter.",
+ fact:"De Godfather werd populair in de jaren '70, rond de film The Godfather uit 1972. Amaretto komt uit Saronno in Noord-Italië en dankt zijn amandelsmaak vaak aan abrikozenpitten.",
+ ing:[[60,"ml","scotch whisky"],[25,"ml","amaretto"],[1,"dash","Angostura bitter"],[null,"","ijsblokjes"],[1,"","grote sinaasappelzeste","g","grote sinaasappelzestes"]],
+ tools:["Old-fashioned-glas (tumbler)","Mixglas","Barlepel","Strainer","Jigger (maatbekertje)","Dunschiller"],
+ prep:[],
+ steps:["Vul het mixglas met {3}.","Voeg {0}, {1} en {2} toe.","Roer tot de cocktail voldoende gekoeld en verwaterd is, zo'n 20 seconden.","Leg enkele verse ijsblokjes in het old-fashioned-glas.","Zeef de cocktail over het ijs.","Knijp {4} boven het glas uit, zodat de geurige olie op de cocktail spat, en leg ze in het glas."]},
 
 {id:"kir-royal",name:"Kir Royal",glass:"Champagneglas (fluitje)",method:"Schenken",cat:["Bubbels"],tint:"#e2b8c6",
  look:{g:"flute",top:"#c62e55",bot:"#7a0f2e",bubbles:1,garnish:[]},
@@ -417,6 +437,16 @@ const C = [
  tools:["Tumbler","Cocktailshaker","Jigger (maatbekertje)","Barlepel","Citruspers","Mes en snijplank"],
  prep:["Koel het glas voor in de vriezer."],
  steps:["Doe {0}, {1}, {2} en {3} in de shaker.","Voeg {4} toe en shake kort en krachtig.","Giet alles, ijs inbegrepen, in het voorgekoelde glas.","Laat {5} over de bolle kant van een barlepel bovenop drijven.","Garneer met {6}."]},
+
+{id:"manhattan",name:"Manhattan",glass:"Martiniglas",method:"Geroerd",cat:["Whisky"],tint:"#e8bfa6",
+ look:{g:"martini",top:"#b8501f",bot:"#7a2410",garnish:["cherrypick"]},
+ taste:"Krachtig, zacht en licht kruidig: de pittige rogge van de whiskey, rond gemaakt door zoete rode vermout, met de warme toets van bitter en een vleugje kers.",
+ fact:"Volgens een hardnekkige legende werd de Manhattan rond 1874 bedacht op een feest van Jennie Churchill, de moeder van Winston, in de Manhattan Club in New York. Mooi verhaal, maar zij was op dat moment in Engeland.",
+ note:"In je recept staan zowel een martiniglas als een coupe. Ik hield het op een martiniglas; een coupe kan ook.",
+ ing:[[50,"ml","rye whiskey"],[25,"ml","zoete rode vermout"],[2,"dash","Angostura bitter"],[null,"","ijsblokjes"],[1,"","maraschinokers en sinaasappelschil op een prikker","g","maraschinokersen en sinaasappelschillen op prikkers"]],
+ tools:["Martiniglas","Mixglas","Barlepel","Strainer","Jigger (maatbekertje)","Cocktailprikker","Dunschiller"],
+ prep:["Koel het martiniglas voor in de vriezer of met ijs en water."],
+ steps:["Vul het mixglas met {3}.","Giet {0}, {1} en {2} in het mixglas.","Roer zo'n 20 à 30 seconden met de barlepel, tot de cocktail goed gekoeld en licht verwaterd is.","Gooi het ijs(water) uit het voorgekoelde glas.","Zeef de cocktail in het martiniglas.","Werk af met {4}."]},
 
 {id:"margarita",name:"Margarita Classic",glass:"Martiniglas",method:"Shaker",cat:["Tequila"],tint:"#d3e6b0",
  look:{g:"martini",top:"#f0f6c8",bot:"#d2e48c",salt:1,garnish:["limewedge"]},
@@ -549,7 +579,7 @@ function art(c,pfx){
     s+=`<g clip-path="url(#${id}c)">`;
     s+=`<rect x="0" y="${lv}" width="200" height="${bot-lv+2}" fill="url(#${id}l)"/>`;
     if(L.float){const h=(bot-lv)*L.float[1];s+=`<rect x="0" y="${lv}" width="200" height="${h}" fill="${L.float[0]}"/><rect x="0" y="${lv+h-3}" width="200" height="6" fill="${L.float[0]}" opacity=".5"/>`}
-    if(L.foam){s+=`<rect x="0" y="${lv-1}" width="200" height="${L.foam}" fill="#fffaf0" opacity=".92"/>`}
+    if(L.foam){s+=`<rect x="0" y="${lv-1}" width="200" height="${L.foam}" fill="${L.foamc||"#fffaf0"}" opacity=".95"/>`}
     if(L.bubbles){for(let i=0;i<22;i++){const x=40+r()*120,y=lv+8+r()*(bot-lv-12);s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(0.8+r()*1.8).toFixed(1)}" fill="#ffffff" opacity="${(0.35+r()*.4).toFixed(2)}"/>`}}
     if(L.ice==="cubes"){const n=L.g==="highball"?5:L.g==="wine"?4:3;for(let i=0;i<n;i++){const x=(L.g==="highball"?72+r()*36:58+i*(80/n)+r()*10),y=(L.g==="highball"?lv-4+i*28+r()*6:lv-6+r()*26);const w=L.g==="highball"?28:26;s+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w}" height="${w}" rx="5" transform="rotate(${(r()*40-20).toFixed(0)} ${x+w/2} ${y+w/2})" fill="#ffffff" opacity=".32" stroke="#ffffff" stroke-opacity=".75" stroke-width="1.5"/>`}}
     if(L.ice==="crushed"){for(let i=0;i<34;i++){const x=48+r()*104,y=lv-8+r()*(bot-lv)*.75,w=6+r()*9;s+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${(w*.8).toFixed(1)}" rx="2" transform="rotate(${(r()*90).toFixed(0)} ${x} ${y})" fill="#ffffff" opacity="${(0.3+r()*.35).toFixed(2)}"/>`}}
@@ -572,6 +602,11 @@ function art(c,pfx){
     if(k==="lemontwist")s+=`<path d="M${rr-4},${ry} c10,6 -8,14 4,22 c10,6 -8,14 4,22" fill="none" stroke="#e8b80f" stroke-width="5" stroke-linecap="round"/><path d="M${rr-4},${ry} c10,6 -8,14 4,22 c10,6 -8,14 4,22" fill="none" stroke="#fff3a0" stroke-width="1.6" stroke-linecap="round" opacity=".8"/>`;
     if(k==="mint"){const x=i?rL:rx-6,y=ry-2;s+=leaf(x,y,-120,18)+leaf(x+2,y,-70,20)+leaf(x-2,y+2,-160,15)+`<path d="M${x},${y+2} L${x+1},${y-14}" stroke="#2c7a3b" stroke-width="1.6"/>`}
     if(k==="raspberry"){const x=rL+10,y=ry-20;s+=`<line x1="${x}" y1="${y-14}" x2="${x+14}" y2="${y+40}" stroke="#7a5a3a" stroke-width="2"/>`;for(let a=0;a<9;a++){const dx=(a%3)*5-5,dy=Math.floor(a/3)*5-5;s+=`<circle cx="${x+3+dx}" cy="${y+8+dy}" r="3.4" fill="#d3204f" stroke="#a3123a" stroke-width=".8"/>`}}
+    if(k==="cherrypick"){const x1=rr-30,y1=ry-30,x2=rr-56,y2=ry+40;s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#8a6a44" stroke-width="2.4" stroke-linecap="round"/>`+
+      `<path d="M${x1-10},${y1+12} q14,-6 18,6 q-14,8 -18,-6z" fill="#ef8a22" stroke="#c9600c" stroke-width="1"/>`+
+      `<path d="M${x2+12},${y2-44} q8,-14 16,-18" stroke="#5a3a1a" stroke-width="1.6" fill="none"/><circle cx="${x2+11}" cy="${y2-38}" r="9" fill="#9e0f26"/><circle cx="${x2+8}" cy="${y2-41}" r="2.6" fill="#ffffff" opacity=".55"/>`}
+    if(k==="orangetwist")s+=`<path d="M${rr-6},${ry-4} c14,6 -10,16 6,26 c14,8 -10,16 6,26" fill="none" stroke="#e9781a" stroke-width="8" stroke-linecap="round"/><path d="M${rr-6},${ry-4} c14,6 -10,16 6,26 c14,8 -10,16 6,26" fill="none" stroke="#ffc173" stroke-width="2.4" stroke-linecap="round" opacity=".8"/>`;
+    if(k==="beans"){const y=GL[L.g].level-3;[[86,-20],[100,10],[114,-35]].forEach(([x,rot])=>{s+=`<g transform="translate(${x},${y}) rotate(${rot})"><ellipse rx="6" ry="4.2" fill="#3b2012"/><path d="M-5,0 q5,-2.4 10,0" stroke="#1a0b05" stroke-width="1.2" fill="none"/></g>`})}
     if(k==="passion"){const y=GL[L.g].level-6;s+=`<ellipse cx="100" cy="${y+2}" rx="24" ry="9" fill="#5b1f4f"/><ellipse cx="100" cy="${y}" rx="21" ry="7.5" fill="#f2b62a"/>`;for(let a=0;a<14;a++)s+=`<circle cx="${(86+r()*28).toFixed(1)}" cy="${(y-4+r()*8).toFixed(1)}" r="1.3" fill="#2a1a10"/>`}
   });
   return s+`</svg>`;
@@ -599,7 +634,7 @@ function saveFavs(){try{localStorage.setItem("favs",JSON.stringify([...favs]))}c
 
 /* ---------- Overzicht ---------- */
 const FILTERS=[["Alle",()=>true],["♥ Favorieten",c=>favs.has(c.id)],["Met shaker",c=>c.method==="Shaker"],["Zonder shaker",c=>c.method!=="Shaker"],
- ["Gin",c=>c.cat.includes("Gin")],["Rum",c=>c.cat.includes("Rum")],["Vodka",c=>c.cat.includes("Vodka")],["Tequila",c=>c.cat.includes("Tequila")],["Bubbels",c=>c.cat.includes("Bubbels")],["Alcoholvrij",c=>c.cat.includes("Alcoholvrij")]];
+ ["Gin",c=>c.cat.includes("Gin")],["Rum",c=>c.cat.includes("Rum")],["Vodka",c=>c.cat.includes("Vodka")],["Tequila",c=>c.cat.includes("Tequila")],["Whisky",c=>c.cat.includes("Whisky")],["Bubbels",c=>c.cat.includes("Bubbels")],["Alcoholvrij",c=>c.cat.includes("Alcoholvrij")]];
 let active=0;
 $("#chips").innerHTML=FILTERS.map((f,i)=>`<button class="chip" data-i="${i}" aria-pressed="${i===0}">${f[0]}</button>`).join("");
 $("#chips").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;active=+b.dataset.i;document.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",x===b));renderList()});
@@ -629,7 +664,8 @@ const SECTIONS=[
  ["Agave","Tequila in de hoofdrol, van zout en zuur tot pittig en fruitig.",["margarita","tommys-margarita","el-diablo"]],
  ["Lang & verfrissend","Highballs met tonic, gember en cola, op veel ijs.",["gin-tonic","moscow-mule","dark-n-stormy","cuba-libre"]],
  ["Tropisch & fruitig","Rum, munt, frambozen en zon in een glas.",["mai-tai","mojito","lazy-red-cheeks"]],
- ["Zoet & romig","Voor bij het dessert of als afsluiter.",["pornstar-martini","white-russian"]],
+ ["Sterk & geroerd","Whisky in de hoofdrol: geroerd, niet geschud.",["manhattan","godfather"]],
+ ["Zoet & romig","Voor bij het dessert of als afsluiter.",["espresso-martini","pornstar-martini","white-russian"]],
  ["Zonder alcohol","Alle smaak, geen alcohol. Ook de Mojito kan virgin.",["bellini-night-orient","pineapple-ginger-fizz"]]
 ];
 function mainIng(c){

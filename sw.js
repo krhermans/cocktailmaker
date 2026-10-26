@@ -1,5 +1,5 @@
 // Bewaart de app offline, zodat hij ook zonder internet werkt (handig aan de bar).
-const CACHE = "cocktail-maker-v3";
+const CACHE = "cocktail-maker-v4";
 const FILES = ["./", "index.html", "manifest.webmanifest", "cocktailkaart.pdf",
   "icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png"];
 
